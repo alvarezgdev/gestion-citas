@@ -9,5 +9,4 @@ import com.hospital.gestion_citas.model.Consultorio;
 
 @Repository
 public interface ConsultorioRepository extends JpaRepository<Consultorio, Integer> {
-    List<Consultorio> findByPiso(Integer piso);
 }

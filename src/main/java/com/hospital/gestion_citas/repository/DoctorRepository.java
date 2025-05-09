@@ -8,5 +8,4 @@ import com.hospital.gestion_citas.model.Doctor;
 
 @Repository
 public interface DoctorRepository extends JpaRepository<Doctor, Integer> {
-    List<Doctor> findByEspecialidad(String especialidad);
 }

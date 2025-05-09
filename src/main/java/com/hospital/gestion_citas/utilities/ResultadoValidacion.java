@@ -1,5 +1,10 @@
 package com.hospital.gestion_citas.utilities;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class ResultadoValidacion {
     private boolean valido;
     private String mensaje;

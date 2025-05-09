@@ -1,48 +1,36 @@
 package com.hospital.gestion_citas.service;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Date;
 
 import org.springframework.stereotype.Service;
 
 import com.hospital.gestion_citas.model.Cita;
-import com.hospital.gestion_citas.model.Consultorio;
-import com.hospital.gestion_citas.model.Doctor;
 import com.hospital.gestion_citas.repository.CitaRepository;
-import com.hospital.gestion_citas.repository.ConsultorioRepository;
-import com.hospital.gestion_citas.repository.DoctorRepository;
 import com.hospital.gestion_citas.utilities.ResultadoValidacion;
 
 @Service
 public class CitaService {
 
     private CitaRepository citaRepository;
-    private DoctorRepository doctorRepository;
-    private ConsultorioRepository consultorioRepository;
 
-    public CitaService(CitaRepository citaRepository, DoctorRepository doctorRepository, ConsultorioRepository consultorioRepository) {
+    public CitaService(CitaRepository citaRepository) {
         this.citaRepository = citaRepository;
-        this.doctorRepository = doctorRepository;
-        this.consultorioRepository = consultorioRepository;
     }
     
 public ResultadoValidacion validarCita(Cita cita) {
         try {
-            // Validar disponibilidad de consultorio
+            // validar disponibilidad de consultorio
             if (citaRepository.existsByConsultorioAndHorarioAndCanceladaFalse(cita.getConsultorio(), cita.getHorario())) {
                 return ResultadoValidacion.error("El consultorio no está disponible en ese horario");
             }
             
-            // Validar disponibilidad del doctor
+            // validar disponibilidad del doctor
             if (citaRepository.existsByDoctorAndHorarioAndCanceladaFalse(
                 cita.getDoctor(), cita.getHorario())) {
                 return ResultadoValidacion.error("El doctor no está disponible en ese horario");
             }
             
-            // Resto de validaciones...
-            
+            citaRepository.save(cita);
             return ResultadoValidacion.exito("La cita está disponible para confirmación");
             
         } catch (Exception e) {
@@ -50,12 +38,13 @@ public ResultadoValidacion validarCita(Cita cita) {
         }
     }
     
-    public void cancelarCita(Integer id) {
-        citaRepository.findById(id).ifPresent(cita -> {
+    public ResultadoValidacion cancelarCita(Cita cita) {
+        if(cita.isCancelada() && cita.getHorario().compareTo(new Date()) < 0){
             cita.setCancelada(true);
             citaRepository.save(cita);
-        });
+            return ResultadoValidacion.exito("Cita cancelada con éxito");
+        }
+        return ResultadoValidacion.error("No es posible cancelar la cita");
     }
-    
-    // Otros métodos necesarios
+
 }
